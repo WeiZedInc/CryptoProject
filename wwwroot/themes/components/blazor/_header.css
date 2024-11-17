@@ -1,0 +1,17 @@
+﻿.rz-header {
+  background-color: var(--rz-header-background-color);
+  min-height: var(--rz-header-min-height);
+  border-bottom: var(--rz-header-border);
+  color: var(--rz-header-color);
+  box-shadow: var(--rz-header-shadow);
+}
+.rz-header.fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--rz-header-z);
+}
+.rz-header a {
+  text-decoration: none;
+}

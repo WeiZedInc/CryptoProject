@@ -1,0 +1,95 @@
+﻿.rz-tree {
+  box-sizing: border-box;
+  display: inline-block;
+  overflow: auto;
+}
+.rz-tree:focus {
+  outline: var(--rz-outline-normal);
+}
+.rz-tree:focus-visible {
+  outline: var(--rz-outline-focus);
+  outline-offset: var(--rz-tree-node-focus-outline-offset);
+}
+
+.rz-tree .rz-treenode.rz-treenode-leaf > .rz-treenode-content > .rz-tree-toggler {
+  visibility: hidden;
+}
+
+.rz-treenode {
+  padding-inline-start: var(--rz-tree-node-toggle-width);
+}
+
+.rz-tree-toggler {
+  cursor: pointer;
+  margin-inline-start: calc(var(--rz-tree-node-toggle-width) * -1);
+  width: var(--rz-tree-node-toggle-width);
+  height: 1.5rem;
+  font-size: var(--rz-icon-size);
+  line-height: 1.5rem;
+  text-align: center;
+  color: var(--rz-tree-node-toggle-color);
+  transition: var(--rz-tree-transition);
+}
+.rz-tree-toggler.rzi-caret-right {
+  /* Right-to-left arrow icons */
+}
+.rz-tree-toggler.rzi-caret-right:before {
+  content: "arrow_right";
+  margin-inline-start: -0.125rem;
+}
+*[dir=rtl] .rz-tree-toggler.rzi-caret-right {
+  transform: rotate(180deg);
+}
+.rz-tree-toggler.rzi-caret-down:before {
+  content: "arrow_drop_down";
+  margin-inline-start: -0.125rem;
+}
+.rz-tree-toggler:hover {
+  color: var(--rz-tree-node-toggle-hover-color);
+}
+
+.rz-treenode-content {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-block: var(--rz-tree-node-margin-block);
+  margin-inline: var(--rz-tree-node-margin-inline);
+}
+.rz-treenode-content .rz-treenode-label {
+  display: flex;
+  align-items: center;
+  cursor: inherit;
+  padding-block: var(--rz-tree-node-padding-block);
+  padding-inline: var(--rz-tree-node-padding-inline);
+}
+.rz-treenode-content .rz-treenode-label .rzi:first-child {
+  margin-inline-end: 0.25rem;
+}
+.rz-tree:focus-visible .rz-treenode-content.rz-state-focused .rz-treenode-label {
+  outline: var(--rz-tree-node-focus-outline);
+  outline-offset: var(--rz-tree-node-focus-outline-offset);
+}
+.rz-treenode-content:not(.rz-treenode-content-selected):hover .rz-treenode-label {
+  background-color: var(--rz-tree-node-hover-background-color);
+  color: var(--rz-tree-node-hover-color);
+  border-radius: var(--rz-tree-node-selected-border-radius);
+}
+.rz-treenode-content .rz-chkbox {
+  margin-inline-end: 0.25rem;
+}
+
+.rz-tree-container,
+.rz-treenode-children {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rz-treenode-label {
+  transition: var(--rz-tree-transition);
+}
+.rz-treenode-content-selected .rz-treenode-label {
+  border-radius: var(--rz-tree-node-selected-border-radius);
+  color: var(--rz-tree-node-selected-color);
+  background-color: var(--rz-tree-node-selected-background-color);
+}

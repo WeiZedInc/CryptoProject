@@ -1,0 +1,21 @@
+﻿.rz-security-code {
+  box-sizing: border-box;
+  display: inline-flex;
+}
+
+.rz-security-code-wrapper {
+  flex: 1;
+  --rz-gap: 0.5rem;
+}
+
+.rz-security-code-input {
+  text-align: center;
+  min-width: var(--rz-security-code-input-min-width);
+  min-height: var(--rz-security-code-input-min-height);
+  width: 100%;
+  height: 100%;
+  padding: var(--rz-security-code-input-padding);
+  font-size: var(--rz-security-code-input-font-size);
+  font-weight: var(--rz-security-code-input-font-weight);
+  line-height: var(--rz-security-code-input-line-height);
+}

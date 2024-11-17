@@ -1,0 +1,8 @@
+﻿.rz-gravatar {
+  box-sizing: border-box;
+  width: var(--rz-gravatar-width);
+  height: var(--rz-gravatar-height);
+  display: inline-block;
+  border-radius: var(--rz-gravatar-border-radius);
+  box-shadow: var(--rz-gravatar-box-shadow);
+}

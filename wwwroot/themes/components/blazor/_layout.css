@@ -1,0 +1,68 @@
+﻿/* Radzen Blazor Layout reset styles */
+:root:has(.rz-layout) {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  font-size: var(--rz-root-font-size);
+}
+:root:has(.rz-layout) body {
+  margin: 0;
+  color: var(--rz-text-color);
+  background-color: var(--rz-body-background-color);
+  font-family: var(--rz-text-font-family);
+  font-size: var(--rz-body-font-size);
+  line-height: var(--rz-body-line-height);
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* RadzenLayout styles */
+.rz-layout {
+  box-sizing: border-box;
+  height: 100vh;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas: "rz-header rz-header" "rz-sidebar rz-body" "rz-footer rz-footer";
+  background-color: var(--rz-layout-background-color);
+}
+.rz-layout .rz-body {
+  grid-area: rz-body;
+  overflow: auto;
+}
+.rz-layout .rz-sidebar {
+  grid-area: rz-sidebar;
+  position: static;
+}
+.rz-layout .rz-header {
+  grid-area: rz-header;
+  z-index: 2;
+}
+.rz-layout .rz-footer {
+  grid-area: rz-footer;
+}
+
+@media (max-width: 768px) {
+  body:has(> .rz-layout) {
+    overflow-x: hidden;
+  }
+  .rz-layout {
+    height: 100dvh;
+  }
+  .rz-header,
+  .rz-footer,
+  .rz-body {
+    width: 100vw;
+  }
+  .rz-layout:has(> .rz-sidebar-collapsed + .rz-sidebar-expanded) {
+    justify-content: end;
+  }
+  .rz-layout:has(> .rz-sidebar-collapsed + .rz-sidebar-expanded) .rz-header, .rz-layout:has(> .rz-sidebar-collapsed + .rz-sidebar-expanded) .rz-footer {
+    margin-inline-start: auto;
+  }
+  .rz-layout:has(> .rz-sidebar-expanded + .rz-sidebar-expanded) .rz-body {
+    width: auto;
+  }
+}
