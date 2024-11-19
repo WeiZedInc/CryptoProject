@@ -1,0 +1,102 @@
+﻿@implements IDisposable
+@inject NavigationManager NavigationManager
+
+<RadzenLayout Style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body';">
+    <RadzenSidebar Style="background: linear-gradient(to bottom, rgb(0, 0, 20), black, rgb(0, 19, 33)); display: flex; flex-direction: column;">
+        <RadzenLink Path="/">
+            <RadzenImage Path="Images/addLogo.png" AlternateText="Crypto Project Logo" Style="max-width: 100%; max-height: 100%;" />
+        </RadzenLink>
+        <RadzenPanelMenu Style="background: transparent; color: rgb(193, 216, 216); font-size: 20px;">
+            <RadzenPanelMenuItem Path="" Text="Home" Icon="directions_car" IconColor="rgb(186, 91, 255)" Style=" border-bottom: none;" />
+            <AuthorizeView>
+                <Authorized>
+                    <RadzenPanelMenuItem Path="Account/Manage" Text="@context.User.Identity?.Name" Icon="person" IconColor="rgb(186, 91, 255)" Style=" border-bottom: none;" />
+                    <form action="Account/Logout" method="post" style="margin: 0; padding: 0;">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                        <button type="submit" class="logout-button">
+                            <span class="material-icons" style="vertical-align: middle; margin-right: 8px; font-size: 20px; color: rgb(186, 91, 255);">
+                            </span>
+                            Logout
+                        </button>
+                    </form>
+                </Authorized>
+                <NotAuthorized>
+                    <RadzenPanelMenuItem Path="Account/Login" Text="Login" Icon="login" IconColor="rgb(186, 91, 255)" Style=" border-bottom: none;" />
+                </NotAuthorized>
+            </AuthorizeView>
+            <AuthorizeView Policy="RequireAdminOrModeratorRole">
+                <Authorized>
+                    
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Policy="RequireAdminRole">
+                <Authorized>
+                    <RadzenPanelMenuItem Path="users" Text="Users" Icon="person" IconColor="rgb(186, 91, 255)" Style=" border-bottom: none;" />
+                </Authorized>
+            </AuthorizeView>
+        </RadzenPanelMenu>
+    </RadzenSidebar>
+    <RadzenBody Style="background: linear-gradient(to top, rgb(0, 19, 33), black); overflow-x: hidden;">
+        @Body
+    </RadzenBody>
+</RadzenLayout>
+
+<style>
+    .logout-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(to right, rgb(186, 91, 255), rgb(115, 55, 193));
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 8px 16px;
+        margin: 10px 0;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .logout-button:hover {
+            background: linear-gradient(to right, rgb(115, 55, 193), rgb(186, 91, 255));
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .logout-button:active {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transform: translateY(0);
+        }
+
+    .material-icons {
+        font-size: 20px;
+    }
+
+</style>
+
+@code {
+    [Parameter]
+    public RenderFragment Body { get; set; }
+
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}

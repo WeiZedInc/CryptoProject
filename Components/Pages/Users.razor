@@ -1,0 +1,125 @@
+﻿@page "/users"
+@using CryptoProject.Components.Shared
+@using CryptoProject.Data
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@inject DialogService DialogService
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Policy = "RequireAdminRole")]
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
+
+<PageTitle>Manage Users</PageTitle>
+
+<h1>Manage Users</h1>
+
+@if (IsLoading)
+{
+    <p>Loading users...</p>
+}
+else if (users == null || users.Count == 0)
+{
+    <p>No users found.</p>
+}
+else
+{
+    <RadzenDataGrid TItem="UserViewModel" Data="@users" AutoGenerateColumns="false">
+        <Columns>
+            <RadzenDataGridColumn TItem="UserViewModel" Property="Email" Title="Email" />
+            <RadzenDataGridColumn TItem="UserViewModel" Property="Roles" Title="Roles">
+                <Template Context="user">
+                    @string.Join(", ", user.Roles)
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="UserViewModel" Title="Actions">
+                <Template Context="user">
+                    <RadzenButton Icon="edit" Text="Edit" Click="@(() => EditUser(user))" />
+                    <RadzenButton Icon="delete" Text="Delete" ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteUser(user))" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+}
+
+
+@code {
+    private List<UserViewModel> users;
+    private bool IsLoading = true; // Add this flag
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+        IsLoading = false; // Set to false after loading
+    }
+
+    private async Task LoadUsers()
+    {
+        IsLoading = true; // Set to true when loading starts
+        try
+        {
+            var userList = await UserManager.Users.ToListAsync();
+            users = new List<UserViewModel>();
+
+            foreach (var user in userList)
+            {
+                var roles = await UserManager.GetRolesAsync(user);
+                users.Add(new UserViewModel
+                    {
+                        Id = user.Id,
+                        Email = user.Email,
+                        Roles = roles.ToList()
+                    });
+            }
+        }
+        finally
+        {
+            IsLoading = false; // Ensure it's set to false even if an error occurs
+        }
+    }
+
+    private async Task EditUser(UserViewModel user)
+    {
+        var result = await DialogService.OpenAsync<EditUserDialog>(
+            "Edit User",
+            new Dictionary<string, object> { { "UserId", user.Id } },
+            new DialogOptions { Width = "500px", Height = "400px" });
+
+        if (result == true)
+        {
+            await LoadUsers();
+        }
+    }
+
+    private async Task DeleteUser(UserViewModel user)
+    {
+        if ((bool)await DialogService.Confirm($"Are you sure you want to delete user '{user.Email}'?", "Delete User"))
+        {
+            var appUser = await UserManager.FindByIdAsync(user.Id);
+            if (appUser != null)
+            {
+                var result = await UserManager.DeleteAsync(appUser);
+                if (result.Succeeded)
+                {
+                    await LoadUsers();
+                }
+                else
+                {
+                    await DialogService.Alert("Failed to delete the user.", "Error");
+                }
+            }
+            else
+            {
+                await DialogService.Alert("User not found.", "Error");
+            }
+        }
+    }
+
+    public class UserViewModel
+    {
+        public string Id { get; set; }
+        public string Email { get; set; }
+        public List<string> Roles { get; set; }
+    }
+}

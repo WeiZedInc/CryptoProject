@@ -2,9 +2,16 @@ using Microsoft.AspNetCore.Identity;
 
 namespace CryptoProject.Data
 {
-    // Add profile data for application users by adding properties to the ApplicationUser class
+    public enum Role
+    {
+        User,
+        Moderator,
+        Admin
+    }
     public class ApplicationUser : IdentityUser
     {
+        public string? FullName { get; set; }
+        public string? PhoneNumber { get; set; }
     }
 
 }

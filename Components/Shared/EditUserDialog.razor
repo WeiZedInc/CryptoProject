@@ -1,0 +1,101 @@
+﻿@using CryptoProject.Data
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@inject DialogService DialogService
+@inject NavigationManager NavigationManager
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
+
+
+<EditForm Model="@UserRolesModel" OnValidSubmit="Save">
+    <RadzenFieldset Legend="Edit User Roles">
+        <div class="p-2">
+            <RadzenLabel Text="Email" />
+            <RadzenTextBox @bind-Value="UserRolesModel.Email" Style="width: 100%;" Disabled="true" />
+        </div>
+        <div class="p-2">
+            <RadzenLabel Text="Roles" />
+            <RadzenListBox @bind-Value="UserRolesModel.SelectedRoles"
+                           Data="@AvailableRoles"
+                           Multiple="true"
+                           Style="width: 100%;"
+                           TValue="List<string>">
+                <Template Context="role">
+                    @role
+                </Template>
+            </RadzenListBox>
+        </div>
+        <RadzenButton Text="Save"
+                      ButtonType="ButtonType.Submit"
+                      Style="margin-top: 10px;" />
+    </RadzenFieldset>
+</EditForm>
+
+@code {
+    [Parameter] public string UserId { get; set; }
+
+    private UserRolesModel UserRolesModel { get; set; } = new();
+    private List<string> AvailableRoles = new List<string> { "User", "Moderator", "Admin" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await UserManager.FindByIdAsync(UserId);
+        if (user == null)
+        {
+            await DialogService.Alert("User not found.", "Error");
+            DialogService.Close(false);
+            return;
+        }
+
+        var userRoles = await UserManager.GetRolesAsync(user);
+
+        UserRolesModel = new UserRolesModel
+            {
+                Email = user.Email,
+                SelectedRoles = userRoles.ToList()
+            };
+    }
+
+    private async Task Save()
+    {
+        Console.WriteLine("Save method called.");
+
+        var user = await UserManager.FindByEmailAsync(UserRolesModel.Email);
+        if (user == null)
+        {
+            await DialogService.Alert("User not found.", "Error");
+            DialogService.Close(false);
+            return;
+        }
+
+        var currentRoles = await UserManager.GetRolesAsync(user);
+
+        var rolesToAdd = UserRolesModel.SelectedRoles.Except(currentRoles).ToList();
+        var rolesToRemove = currentRoles.Except(UserRolesModel.SelectedRoles).ToList();
+
+        if (rolesToRemove.Any())
+        {
+            var removeResult = await UserManager.RemoveFromRolesAsync(user, rolesToRemove);
+            if (!removeResult.Succeeded)
+            {
+                await DialogService.Alert("Failed to remove roles.", "Error");
+                return;
+            }
+        }
+
+        if (rolesToAdd.Any())
+        {
+            var addResult = await UserManager.AddToRolesAsync(user, rolesToAdd);
+            if (!addResult.Succeeded)
+            {
+                await DialogService.Alert("Failed to add roles.", "Error");
+                return;
+            }
+        }
+
+        // Update the security stamp to sign out the user if needed
+        await UserManager.UpdateSecurityStampAsync(user);
+
+        DialogService.Close(true);
+    }
+}

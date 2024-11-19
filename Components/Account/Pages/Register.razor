@@ -20,11 +20,11 @@
 <h1>Register</h1>
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-4" style="color: black">
         <StatusMessage Message="@Message" />
         <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
             <DataAnnotationsValidator />
-            <h2>Create a new account.</h2>
+            <h2 style="color: white !important">Create a new account.</h2>
             <hr />
             <ValidationSummary class="text-danger" role="alert" />
             <div class="form-floating mb-3">
@@ -72,8 +72,15 @@
             identityErrors = result.Errors;
             return;
         }
-
         Logger.LogInformation("User created a new account with password.");
+
+        var addToRoleResult = await UserManager.AddToRoleAsync(user, Role.User.ToString());
+        if (!addToRoleResult.Succeeded)
+        {
+            identityErrors = addToRoleResult.Errors;
+            return;
+        }
+        Logger.LogInformation("User assigned to role (User).");
 
         var userId = await UserManager.GetUserIdAsync(user);
         var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
